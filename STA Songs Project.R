@@ -21,3 +21,13 @@ dim(music)
 summary(music)
 
 
+# trinity
+
+
+# Mohammad
+
+# anna
+
+# Noelia
+
+
