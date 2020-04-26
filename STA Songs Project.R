@@ -27,6 +27,21 @@ summary(music)
 # Mohammad
 
 # anna
+# called my dataset top10
+model1 <- lm(top10$pop~top10$bpm+top10$dnce+top10$live+top10$val+top10$spch)
+summary(model1) 
+hist(top10$dnce)
+hist(top10$bpm)
+hist(top10$live)
+hist(top10$val)
+
+year.f = as.factor(top10$year)
+model.matrix(~year.f)
+model2 <- lm(top10$year~top10$bpm+top10$dnce+top10$live+top10$val+top10$spch+top10$pop)
+summary(model2)
+
+cor(top10$bpm,top10$dnce) # negative
+cor(top10$bpm,top10$pop)
 
 # Noelia
 
