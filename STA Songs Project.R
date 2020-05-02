@@ -81,12 +81,6 @@ cor(music$Genre == 'electro', music$Acousticness)
 cor(music$Genre == 'electro', music$Speechiness)
 cor(music$Genre == 'electro', music$Speechiness)
 
-hist(music$Danceability)
-hist(music$BPM)
-hist(music$Liveness)
-hist(music$Valence)
-
-
 # Data Modeling
 
 year.f = as.factor(music$Year)
@@ -95,4 +89,34 @@ model2 <- lm(Year~ BPM + dB + Danceability + Duration + Liveness + Valence +
                Speechiness + Popularity, data = music)
 summary(model2)
 
+
+#histograms of the variables
+hist(music$BPM) 
+hist(music$Danceability)  
+hist(music$Enrgy)  
+hist(music$dB)  # skewed left
+hist(music$Liveness) # skewed right
+hist(music$Valence)
+hist(music$Duration) # skewed right
+hist(music$Acousticness) # skewed right
+hist(music$Speechiness) # skewed right
+hist(musicPopularity) # skewed left
+#basic correlations
+plot(music$Danceability,music$Valence) # theres a positive correlation between danceability and valance 
+plot(music$BPM,music$Valence)
+plot(music$Duration,music$Popularity)
+plot(music$Valence,music$Enrgy) # theres a positive correlation between valence and energy 
+
+# ggplots
+library(ggplot2)
+year1= subset(music, Year<2015)
+year1=as.factor(year1)
+
+ggplot(data = music, aes(x=music$Duration, y=music$Popularity)) +
+  geom_point(alpha = 0.5, aes(color=music$BPM, size=music$Danceability, shape=music$Year)) +
+  xlab('Duration') + ylab('Popularity')
+
+ggplot(data = music, aes(x=music$Valence, y=music$Enrgy)) +
+  geom_point(alpha = 0.5, aes(color=music$Liveness, size=music$Acousticness)) +
+  xlab('Valence') + ylab('Energy')
 
