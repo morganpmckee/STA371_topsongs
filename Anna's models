@@ -1,9 +1,15 @@
 install.packages('boot')
 library(boot)
+install.packages("leaps")
+library(leaps) 
+
 
 # pop model
+selected_reg = regsubsets(pop~bpm+nrgy+dnce+live,data=top10,method="backward")
+plot(selected_reg, scale="r2")
+
 summary(lm(pop~year+bpm+nrgy+dnce+live+val,data=top10))
-summary(lm(pop~year+bpm+dnce+live,data=top10))
+summary(lm(pop~year+dnce+live,data=top10))
 
 set.seed(104)
 validation_cases = sample(1:301, 50, replace = FALSE)
@@ -11,7 +17,7 @@ training_cases = setdiff(1:301, validation_cases)
 training_set = top10[training_cases,]
 validation_set = top10[validation_cases,]
 
-pop_model = lm(pop~year+bpm+dnce+live, data=training_set)
+pop_model = lm(pop~year+dnce+live, data=training_set)
 
 predicted_y = predict(pop_model, validation_set) 
 mean((validation_set$pop - predicted_y)^2) # 162.7004
