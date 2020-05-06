@@ -1,0 +1,87 @@
+
+
+
+#dance model 
+
+summary(lm(Danceability ~ BPM + Energy + Liveness + Valence + Popularity, data = music))
+
+summary(lm(Danceability ~ BPM + Liveness + Valence + Popularity, data = music))
+
+validation_cases = sample(1:301, 50, replace = FALSE)
+training_cases = setdiff(1:301, validation_cases)
+training_set = music[training_cases,]
+validation_set = music[validation_cases,]
+
+dancemodel = lm(Danceability ~ BPM + Energy + Liveness + Valence + Popularity,
+           data=training_set)
+
+predicted_y = predict(dancemodel, validation_set)
+mean((validation_set$Danceability - predicted_y)^2) #95.58909
+
+dancetest = lm(Danceability ~ BPM + Liveness + Valence + Popularity,
+            data=training_set)
+
+predicted_y2 = predict(dancetest, validation_set)
+mean((validation_set$Danceability - predicted_y2)^2) #94.6805
+
+
+#Energy model
+
+
+summary(lm(Energy~ BPM + dB + Danceability + Duration + Liveness + Valence + 
+             + Popularity, data = music ))
+
+summary(lm(Energy~  + dB + Danceability + Duration + Liveness + Valence +  #BPM had highest p value so remove
+             + Popularity, data = music))
+
+validation_cases = sample(1:301, 50, replace = FALSE)
+training_cases = setdiff(1:301, validation_cases)
+training_set = music[training_cases,]
+validation_set = music[validation_cases,]
+
+energymodel = lm(Energy~ BPM + dB + Danceability + Duration + Liveness + Valence + 
+                   + Popularity,   data=training_set)
+
+predicted_y = predict(energymodel, validation_set)
+mean((validation_set$Energy - predicted_y)^2)  #129.8545
+
+energytst = lm(lm(Energy~  dB + Danceability + Duration + Liveness + Valence + Popularity,  data=training_set))
+
+predicted_y2 = predict(energytst, validation_set)
+mean((validation_set$Energy - predicted_y2)^2)  #116.2611
+
+
+
+#duration model 
+
+
+
+summary(lm(Duration ~ BPM + dB + Danceability +  Liveness + Valence + Speechiness
+           + Popularity, data = music))  #removing db for test
+
+summary(lm(Duration ~ BPM + Danceability +  Liveness + Valence + Speechiness
+           + Popularity, data = music)) 
+
+validation_cases = sample(1:301, 50, replace = FALSE)
+training_cases = setdiff(1:301, validation_cases)
+training_set = music[training_cases,]
+validation_set = music[validation_cases,]
+
+Duartionmodel = lm(Duration ~ BPM + dB + Danceability +  Liveness + Valence + Speechiness
+                 + Popularity,   data=training_set)
+
+predicted_y = predict(durationmodel, validation_set)
+mean((validation_set$Duration - predicted_y)^2)  #1654.036
+
+durationtst = lm(Duration ~ BPM + Danceability +  Liveness + Valence + Speechiness
+                 + Popularity,  data=training_set)
+
+predicted_y2 = predict(durationtst, validation_set)
+mean((validation_set$Duration - predicted_y2)^2)  #1576.374
+
+
+
+
+
+#
+
