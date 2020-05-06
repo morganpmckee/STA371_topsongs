@@ -20,7 +20,7 @@ validation_set = top10[validation_cases,]
 pop_model = lm(pop~year+dnce+live, data=training_set)
 
 predicted_y = predict(pop_model, validation_set) 
-mean((validation_set$pop - predicted_y)^2) # 162.7004
+mean((validation_set$pop - predicted_y)^2) # 156.3503
 
 
 # live model
