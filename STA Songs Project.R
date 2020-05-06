@@ -120,3 +120,27 @@ ggplot(data = music, aes(x=music$Valence, y=music$Enrgy)) +
   geom_point(alpha = 0.5, aes(color=music$Liveness, size=music$Acousticness)) +
   xlab('Valence') + ylab('Energy')
 
+# square pop
+music$PopularitySq= music$Popularity^2
+model2 = lm(PopularitySq ~ BPM + Energy + dB + Danceability + Duration + Liveness + Valence + Speechiness + Acousticness, data = music)
+qqnorm(residuals(model2))
+qqline(residuals(model2))
+hist(residuals(model2))
+summary(model2) # About 6.575% of variation in Popularity can be explained by this model
+
+selected_reg4 = regsubsets(PopularitySq ~ BPM + Energy + dB + Danceability + Duration + Liveness + Valence + Speechiness + Acousticness,
+                           data=music,method = "exhaustive",nvmax=10)
+plot(selected_reg4, scale="r2")
+
+#can we do better
+music$BPMlog = log(music$BPM)
+music$Energylog = log(music$Energy)
+music$Danceabilitylog = log(music$Danceability)
+
+model.1 = lm(PopularitySq ~ BPMlog + Energylog + dB + Danceabilitylog + Duration + Liveness + Valence + Speechiness + Acousticness, data = music)
+qqnorm(residuals(model.1))
+qqline(residuals(model.1))
+hist(residuals(model.1))
+summary(model.1) # About 4% of variation in Popularity can be explained by this model
+
+
