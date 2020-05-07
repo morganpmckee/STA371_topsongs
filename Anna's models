@@ -6,7 +6,7 @@ library(leaps)
 
 # pop model
 selected_reg = regsubsets(pop~bpm+nrgy+dnce+live,data=top10,method="backward")
-plot(selected_reg, scale="r2")
+plot(selected_reg, scale="r2", main="Popularity model")
 
 summary(lm(pop~year+bpm+nrgy+dnce+live+val,data=top10))
 summary(lm(pop~year+dnce+live,data=top10))
