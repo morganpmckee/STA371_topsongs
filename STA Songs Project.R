@@ -203,7 +203,7 @@ mean((validation_set$Duration - predicted_y2)^2)  #1576.374
 
 
 # Popularity model
-selected_reg = regsubsets(Pop~BPMlog+Energylog+Danceabilitylog+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music,method="backward")
+selected_reg = regsubsets(Poularity~BPMlog+Energylog+Danceabilitylog+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music,method="backward")
 plot(selected_reg, scale="r2")
 
 summary(lm(Popularity~BPMlog+Energylog+Danceabilitylog+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music))
