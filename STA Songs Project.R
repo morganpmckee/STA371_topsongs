@@ -235,7 +235,7 @@ validation_set = top10[validation_cases,]
 live_model = lm(Liveness~BPMlog+Energylog+Danceabilitylog+Popularity+Valence+Duration+Speechiness, data=music)
 
 predicted_y = predict(live_model, validation_set) 
-mean((validation_set$live - predicted_y)^2) 
+mean((validation_set$Liveness - predicted_y)^2) 
 
 
 # bpm model
@@ -253,7 +253,7 @@ validation_set = top10[validation_cases,]
 bpm_model = lm(BPMlog~Energylog+Danceabilitylog+Liveness+dB+Duration+Acousticness+Speechiness, data=music)
 
 predicted_y = predict(bpm_model, validation_set) 
-mean((validation_set$live - predicted_y)^2) 
+mean((validation_set$BPMlog - predicted_y)^2) 
 
 # Extra Portion
 
