@@ -211,13 +211,13 @@ summary(lm(Popularity~BPMlog+Energylog+Danceabilitylog+Liveness+Valence+dB+Durat
 set.seed(104)
 validation_cases = sample(1:301, 50, replace = FALSE)
 training_cases = setdiff(1:301, validation_cases)
-training_set = top10[training_cases,]
-validation_set = top10[validation_cases,]
+training_set = music[training_cases,]
+validation_set = music[validation_cases,]
 
 pop_model = lm(Pop~BPMlog+Energylog+Danceabilitylog+Liveness+dB+Duration+Acousticness, data=music)
 
 predicted_y = predict(pop_model, validation_set) 
-mean((validation_set$pop - predicted_y)^2)
+mean((validation_set$Popularity - predicted_y)^2)
 
 
 # live model
@@ -229,13 +229,13 @@ summary(lm(Liveness~BPMlog+Energylog+Danceabilitylog+Popularity+Valence+Duration
 set.seed(104)
 validation_cases = sample(1:301, 50, replace = FALSE)
 training_cases = setdiff(1:301, validation_cases)
-training_set = top10[training_cases,]
-validation_set = top10[validation_cases,]
+training_set = music[training_cases,]
+validation_set = music[validation_cases,]
 
 live_model = lm(Liveness~BPMlog+Energylog+Danceabilitylog+Popularity+Valence+Duration+Speechiness, data=music)
 
 predicted_y = predict(live_model, validation_set) 
-mean((validation_set$live - predicted_y)^2) 
+mean((validation_set$Liveness - predicted_y)^2) 
 
 
 # bpm model
@@ -247,13 +247,13 @@ summary(lm(BPMlog~Energylog+Danceabilitylog+Liveness+dB+Duration+Acousticness+Sp
 set.seed(104)
 validation_cases = sample(1:301, 50, replace = FALSE)
 training_cases = setdiff(1:301, validation_cases)
-training_set = top10[training_cases,]
-validation_set = top10[validation_cases,]
+training_set = music[training_cases,]
+validation_set = music[validation_cases,]
 
 bpm_model = lm(BPMlog~Energylog+Danceabilitylog+Liveness+dB+Duration+Acousticness+Speechiness, data=music)
 
 predicted_y = predict(bpm_model, validation_set) 
-mean((validation_set$live - predicted_y)^2) 
+mean((validation_set$BPMlog - predicted_y)^2) 
 
 #loudness model
 select_db = regsubsets(dB ~ BPMlog + Energylog + PopularitySq + Danceabilitylog + Duration + Liveness + Valence + Speechiness + Acousticness, data = music, method =  "backward")
