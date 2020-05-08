@@ -57,8 +57,14 @@ tail(names(sort(table(music$Artist))),5)
 tail(names(sort(table(music$Genre))),5)
 
 # Pair Plot
-library('dplyr')
-
+install.packages('psych')
+library(psych)
+pairs.panels(music[,6:15], 
+             method = "pearson", 
+             hist.col = "red",
+             density = TRUE,
+             ellipses = TRUE 
+)
 
 
 # Tree Map
@@ -84,7 +90,6 @@ h4 = hist(music$Popularity)
 h5 = hist(music$dB)
 h6 = hist(music$Energy)
 h7 = hist(music$Speechiness)
-grid.arrange(h1, h2, h3, h4, h5, h6, h7, nrow = 3)
 
 # Data Modeling
 
@@ -127,103 +132,117 @@ library('boot')
 
 #dance model 
 
-select_dancemodel = regsubsets(Danceabilitylog ~ BPMlog + Energylog + Liveness + Valence + PopularitySq,  data=music)
-plot(select_dancemodel, scale= 'r2', main = 'Dance model')
-summary(select_dancemodel)
+summary(lm(Danceability ~ BPM + Energy + Liveness + Valence + Popularity, data = music))
 
-dance = lm(Danceabilitylog ~ BPMlog + Energylog + Liveness + Valence + Popularity, data = music)
+summary(lm(Danceability ~ BPM + Liveness + Valence + Popularity, data = music))
 
-dancemodel = lm(Danceabilitylog ~ BPMlog + Energylog + Liveness + Valence + Popularity, data = training_set)
+validation_cases = sample(1:301, 50, replace = FALSE)
+training_cases = setdiff(1:301, validation_cases)
+training_set = music[training_cases,]
+validation_set = music[validation_cases,]
+
+dancemodel = lm(Danceability ~ BPM + Energy + Liveness + Valence + Popularity,
+                data=training_set)
 
 predicted_y = predict(dancemodel, validation_set)
-mean((validation_set$Danceabilitylog - predicted_y)^2) #.0363
+mean((validation_set$Danceability - predicted_y)^2) #95.58909
 
+dancetest = lm(Danceability ~ BPM + Liveness + Valence + Popularity,
+               data=training_set)
 
+predicted_y2 = predict(dancetest, validation_set)
+mean((validation_set$Danceability - predicted_y2)^2) #94.6805
 
 
 #Energy model
 
-select_energy = regsubsets(Energylog~ BPMlog + dB + Danceabilitylog + Duration + Liveness + Valence + 
-                             + PopularitySq,  data=music)
-plot(select_energy, scale= 'r2', main = 'Energy model')
-summary(select_energy)
+summary(lm(Energy~ BPM + dB + Danceability + Duration + Liveness + Valence + 
+             + Popularity, data = music ))
 
-energy = lm(Energylog~ BPMlog + dB + Danceabilitylog + Duration + Liveness + Valence + 
-              + PopularitySq, data = music)
+summary(lm(Energy~  + dB + Danceability + Duration + Liveness + Valence +  #BPM had highest p value so remove
+             + Popularity, data = music))
 
-energymodel = lm(Energylog~ BPMlog + dB + Danceabilitylog + Duration + Liveness + Valence + 
-                   + PopularitySq, data = training_set)
+validation_cases = sample(1:301, 50, replace = FALSE)
+training_cases = setdiff(1:301, validation_cases)
+training_set = music[training_cases,]
+validation_set = music[validation_cases,]
+
+energymodel = lm(Energy~ BPM + dB + Danceability + Duration + Liveness + Valence + 
+                   + Popularity,   data=training_set)
 
 predicted_y = predict(energymodel, validation_set)
-mean((validation_set$Energylog - predicted_y)^2)
+mean((validation_set$Energy - predicted_y)^2)  #129.8545
 
+energytst = lm(lm(Energy~  dB + Danceability + Duration + Liveness + Valence + Popularity,  data=training_set))
+
+predicted_y2 = predict(energytst, validation_set)
+mean((validation_set$Energy - predicted_y2)^2)  #116.2611
 
 
 
 #duration model 
 
-select_duration = regsubsets(Duration ~ BPMlog + dB + Danceabilitylog +  Liveness + Valence + Speechiness
-                            + PopularitySq,  data=music)
-plot(select_duration, scale= 'r2', main = 'Duration model')
-summary(select_energy)
+summary(lm(Duration ~ BPM + dB + Danceability +  Liveness + Valence + Speechiness
+           + Popularity, data = music))  #removing db for test
 
-duration = lm(Duration ~ BPMlog + dB + Danceabilitylog +  Liveness + Valence + Speechiness
-              + PopularitySq, data = music)
+summary(lm(Duration ~ BPM + Danceability +  Liveness + Valence + Speechiness
+           + Popularity, data = music)) 
 
-durationmodel = lm(Duration ~ BPMlog + dB + Danceabilitylog +  Liveness + Valence + Speechiness
-                   + PopularitySq, data = training_set)
 
-predicted_y = predict(durationmodel, validation_set)
-mean((validation_set$Duration - predicted_y)^2) #939.772
+duartion_model = lm(Duration ~ BPM + dB + Danceability +  Liveness + Valence + Speechiness
+                   + Popularity,   data=training_set)
+
+predicted_y = predict(duration_model, validation_set)
+mean((validation_set$Duration - predicted_y)^2)  #1654.036
+
+durationtst = lm(Duration ~ BPM + Danceability +  Liveness + Valence + Speechiness
+                 + Popularity,  data=training_set)
+
+predicted_y2 = predict(durationtst, validation_set)
+mean((validation_set$Duration - predicted_y2)^2)  #1576.374
 
 
 # Popularity model
-selected_reg = regsubsets(Poularity~BPMlog+Energylog+Danceabilitylog+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music,method="backward")
+selected_reg = regsubsets(PoularitySq ~ BPMlog + Energylog
+                          + Danceabilitylog + Liveness +Valence + dB + Duration + 
+                            Acousticness + Speechiness,data=music,method="backward")
 plot(selected_reg, scale="r2")
 
-summary(lm(Popularity~BPMlog+Energylog+Danceabilitylog+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music))
+summary(lm(PopularitySq ~ BPMlog + Energylog + Danceabilitylog + Liveness + 
+             Valence + dB + Duration + Acousticness + Speechiness, data=music))
 
-set.seed(104)
-validation_cases = sample(1:301, 50, replace = FALSE)
-training_cases = setdiff(1:301, validation_cases)
-training_set = music[training_cases,]
-validation_set = music[validation_cases,]
 
-pop_model = lm(Pop~BPMlog+Energylog+Danceabilitylog+Liveness+dB+Duration+Acousticness, data=music)
+pop_model = lm(PopularitySq ~ BPMlog + Energylog + Danceabilitylog + 
+                 Liveness + dB + Duration + Acousticness, data=music)
 
 predicted_y = predict(pop_model, validation_set) 
-mean((validation_set$Popularity - predicted_y)^2)
+mean((validation_set$PopularitySq - predicted_y)^2)
 
 
 # live model
-selected_reg = regsubsets(Liveness~BPMlog+Energylog+Danceabilitylog+Popularity+Valence+dB+Duration+Acousticness+Speechiness,data=music,method="backward")
+selected_reg = regsubsets(Liveness ~ BPMlog + Energylog + Danceabilitylog + PopularitySq 
+                          + Valence + dB + Duration + Acousticness + 
+                            Speechiness, data=music, method="backward")
 plot(selected_reg, scale="r2")
 
-summary(lm(Liveness~BPMlog+Energylog+Danceabilitylog+Popularity+Valence+Duration+Speechiness,data=music))
+summary(lm(Liveness~ BPMlog + Energylog + Danceabilitylog + PopularitySq + Valence + 
+             Duration + Speechiness,data=music))
 
-set.seed(104)
-validation_cases = sample(1:301, 50, replace = FALSE)
-training_cases = setdiff(1:301, validation_cases)
-training_set = music[training_cases,]
-validation_set = music[validation_cases,]
-
-live_model = lm(Liveness~BPMlog+Energylog+Danceabilitylog+Popularity+Valence+Duration+Speechiness, data=music)
+live_model = lm(Liveness~ BPMlog + Energylog + Danceabilitylog + PopularitySq + Valence
+                + Duration + Speechiness, data=music)
 
 predicted_y = predict(live_model, validation_set) 
 mean((validation_set$Liveness - predicted_y)^2) 
 
 
 # bpm model
-selected_reg = regsubsets(BPMlog~Popularity+Energylog+Danceabilitylog+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music,method="backward")
+selected_reg = regsubsets(BPMlog~ PopularitySq + Energylog + Danceabilitylog +
+                            Liveness + Valence + dB + Duration + Acousticness + 
+                            Speechiness,data=music,method="backward")
 plot(selected_reg, scale="r2")
 
-summary(lm(BPMlog~Energylog+Danceabilitylog+Liveness+dB+Duration+Acousticness+Speechiness,data=music))
-
-set.seed(104)
-validation_cases = sample(1:301, 50, replace = FALSE)
-training_cases = setdiff(1:301, validation_cases)
-training_set = music[training_cases,]
-validation_set = music[validation_cases,]
+summary(lm(BPMlog~ Energylog + Danceabilitylog + Liveness + dB 
+           + Duration + Acousticness + Speechiness, data=music))
 
 bpm_model = lm(BPMlog~Energylog+Danceabilitylog+Liveness+dB+Duration+Acousticness+Speechiness, data=music)
 
@@ -231,48 +250,62 @@ predicted_y = predict(bpm_model, validation_set)
 mean((validation_set$BPMlog - predicted_y)^2) 
 
 #loudness model
-select_db = regsubsets(dB ~ BPMlog + Energylog + PopularitySq + Danceabilitylog + Duration + Liveness + Valence + Speechiness + Acousticness, data = music, method =  "backward")
+select_db = regsubsets(dB ~ BPMlog + Energylog + PopularitySq + 
+                         Danceabilitylog + Duration + Liveness + Valence + 
+                         Speechiness + Acousticness, data = music, method =  "backward")
 plot(select_db, scale= 'r2', main = "Loudness Model" )
 summary(select_db)
 
-loudness = lm(dB~ BPMlog + Energylog + PopularitySq + Danceabilitylog + Duration + Liveness + Valence + Speechiness + Acousticness, data = music)
+loudness = lm(dB~ BPMlog + Energylog + PopularitySq + Danceabilitylog + 
+                Duration + Liveness + Valence + Speechiness + Acousticness, data = music)
 summary(loudness)
 #47.41% of model is explained by model 
 #valence,speechiness, acousticness, and popularity are the most significant 
 
-loud_model = lm(dB ~ PopularitySq + BPMlog + Energylog + Danceabilitylog + Duration + Liveness + Valence + Speechiness + Acousticness, data = train_set)
+loud_model = lm(dB ~ PopularitySq + BPMlog + Energylog + Danceabilitylog + 
+                  Duration + Liveness + Valence + Speechiness + 
+                  Acousticness, data = train_set)
 predicted_ydb= predict(loud_model, val_set)
 mean((val_set$dB - predicted_ydb)^2)
 #mean sse is 1.73, low value signifying a good model 
 
 #acous model 
-acousmodel = lm(Acousticness ~ dB + PopularitySq + BPMlog + Energylog + Danceabilitylog + Duration + Liveness + Valence + Speechiness, data = music)
+acousmodel = lm(Acousticness ~ dB + PopularitySq + BPMlog + Energylog + 
+                  Danceabilitylog + Duration + Liveness + Valence 
+                + Speechiness, data = music)
 summary(acousmodel)
 #db, nrgy, dnce are statistically significant 
 
-select_acous = regsubsets(Acousticness ~ dB + PopularitySq + BPMlog + Energylog + Danceabilitylog + Duration + Liveness + Valence + Speechiness, data= music, method = "backward")
+select_acous = regsubsets(Acousticness ~ dB + PopularitySq + BPMlog + Energylog + 
+                            Danceabilitylog + Duration + Liveness + Valence +
+                            Speechiness, data= music, method = "backward")
 plot(select_acous, scale= 'r2', main = "Acousticness Model")
 
 
-acous_model = lm(Acousticness ~ dB + PopularitySq + BPMlog + Energylog + Danceabilitylog + Duration + Liveness + Valence + Speechiness,data = train_set )
+acous_model = lm(Acousticness ~ dB + PopularitySq + BPMlog + Energylog + Danceabilitylog 
+                 + Duration + Liveness + Valence + Speechiness,data = training_set )
 
-predicted_yacous = predict(acous_model, val_set)
-mean((val_set$Acousticness - predicted_yacous)^2)
+predicted_yacous = predict(acous_model, validation_set)
+mean((validation_set$Acousticness - predicted_yacous)^2)
 #mean sse 207.21
 
 #spch 
-spch = lm(Speechiness~ dB + PopularitySq + BPMlog + Energylog + Danceabilitylog + Duration + Liveness + Valence + Acousticness, data = music)
+spch = lm(Speechiness~ dB + PopularitySq + BPMlog + Energylog + Danceabilitylog + 
+            Duration + Liveness + Valence + Acousticness, data = music)
 summary(spch)
 #nrgy, live, val are statistically significant, 9.35% is represented by model 
 
-select_spch = regsubsets(Speechiness~dB + PopularitySq + BPMlog + Energylog + Danceabilitylog + Duration + Liveness + Valence + Acousticness, data= music, method = "backward")
+select_spch = regsubsets(Speechiness~dB + PopularitySq + BPMlog + Energylog + 
+                           Danceabilitylog + Duration + Liveness + Valence + 
+                           Acousticness, data= music, method = "backward")
 plot(select_spch, scale= 'r2', main = "Speechiness Model")
 
 
-spch_model = lm(Speechiness ~ dB + PopularitySq + BPMlog + Energylog + Danceabilitylog + Duration + Liveness + Valence + Acousticness, data = train_set)
+spch_model = lm(Speechiness ~ dB + PopularitySq + BPMlog + Energylog + Danceabilitylog + 
+                  Duration + Liveness + Valence + Acousticness, data = training_set)
 
-predict_yspch = predict(spch_model, val_set)
-mean((val_set$Speechiness - predict_yspch)^2)
+predict_yspch = predict(spch_model, validation_set)
+mean((validation_set$Speechiness - predict_yspch)^2)
 #mean sse 82.74
 
 
@@ -337,5 +370,3 @@ grid.arrange(p1, p2, p3, p4, nrow = 2)
 
 # k means did not perform well because of differing clusters with different levels of densities or clusters 
 # of different sizes as exhibited in HAC
-
-
