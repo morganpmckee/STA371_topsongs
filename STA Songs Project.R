@@ -206,7 +206,7 @@ mean((validation_set$Duration - predicted_y2)^2)  #1576.374
 selected_reg = regsubsets(Pop~BPMlog+Energylog+Danceabilitylog+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music,method="backward")
 plot(selected_reg, scale="r2")
 
-summary(lm(Pop~BPMlog+Energylog+Danceabilitylog+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music))
+summary(lm(Popularity~BPMlog+Energylog+Danceabilitylog+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music))
 
 set.seed(104)
 validation_cases = sample(1:301, 50, replace = FALSE)
