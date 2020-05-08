@@ -132,74 +132,54 @@ library('boot')
 
 #dance model 
 
-summary(lm(Danceability ~ BPM + Energy + Liveness + Valence + Popularity, data = music))
+select_dancemodel = regsubsets(Danceabilitylog ~ BPMlog + Energylog + Liveness + Valence + PopularitySq,  data=music)
+plot(select_dancemodel, scale= 'r2', main = 'Dance model')
+summary(select_dancemodel)
 
-summary(lm(Danceability ~ BPM + Liveness + Valence + Popularity, data = music))
+dance = lm(Danceabilitylog ~ BPMlog + Energylog + Liveness + Valence + Popularity, data = music)
 
-validation_cases = sample(1:301, 50, replace = FALSE)
-training_cases = setdiff(1:301, validation_cases)
-training_set = music[training_cases,]
-validation_set = music[validation_cases,]
-
-dancemodel = lm(Danceability ~ BPM + Energy + Liveness + Valence + Popularity,
-                data=training_set)
+dancemodel = lm(Danceabilitylog ~ BPMlog + Energylog + Liveness + Valence + Popularity, data = training_set)
 
 predicted_y = predict(dancemodel, validation_set)
-mean((validation_set$Danceability - predicted_y)^2) #95.58909
+mean((validation_set$Danceabilitylog - predicted_y)^2) #.0363
 
-dancetest = lm(Danceability ~ BPM + Liveness + Valence + Popularity,
-               data=training_set)
-
-predicted_y2 = predict(dancetest, validation_set)
-mean((validation_set$Danceability - predicted_y2)^2) #94.6805
 
 
 #Energy model
 
-summary(lm(Energy~ BPM + dB + Danceability + Duration + Liveness + Valence + 
-             + Popularity, data = music ))
 
-summary(lm(Energy~  + dB + Danceability + Duration + Liveness + Valence +  #BPM had highest p value so remove
-             + Popularity, data = music))
+select_energy = regsubsets(Energylog~ BPMlog + dB + Danceabilitylog + Duration + Liveness + Valence + 
+                             + PopularitySq,  data=music)
+plot(select_energy, scale= 'r2', main = 'Energy model')
+summary(select_energy)
 
-validation_cases = sample(1:301, 50, replace = FALSE)
-training_cases = setdiff(1:301, validation_cases)
-training_set = music[training_cases,]
-validation_set = music[validation_cases,]
+energy = lm(Energylog~ BPMlog + dB + Danceabilitylog + Duration + Liveness + Valence + 
+              + PopularitySq, data = music)
 
-energymodel = lm(Energy~ BPM + dB + Danceability + Duration + Liveness + Valence + 
-                   + Popularity,   data=training_set)
+energymodel = lm(Energylog~ BPMlog + dB + Danceabilitylog + Duration + Liveness + Valence + 
+                   + PopularitySq, data = training_set)
 
 predicted_y = predict(energymodel, validation_set)
-mean((validation_set$Energy - predicted_y)^2)  #129.8545
+mean((validation_set$Energylog - predicted_y)^2) #.041
 
-energytst = lm(lm(Energy~  dB + Danceability + Duration + Liveness + Valence + Popularity,  data=training_set))
-
-predicted_y2 = predict(energytst, validation_set)
-mean((validation_set$Energy - predicted_y2)^2)  #116.2611
 
 
 
 #duration model 
 
-summary(lm(Duration ~ BPM + dB + Danceability +  Liveness + Valence + Speechiness
-           + Popularity, data = music))  #removing db for test
+select_duration = regsubsets(Duration ~ BPMlog + dB + Danceabilitylog +  Liveness + Valence + Speechiness
+                            + PopularitySq,  data=music)
+plot(select_duration, scale= 'r2', main = 'Duration model')
+summary(select_energy)
 
-summary(lm(Duration ~ BPM + Danceability +  Liveness + Valence + Speechiness
-           + Popularity, data = music)) 
+duration = lm(Duration ~ BPMlog + dB + Danceabilitylog +  Liveness + Valence + Speechiness
+              + PopularitySq, data = music)
 
+durationmodel = lm(Duration ~ BPMlog + dB + Danceabilitylog +  Liveness + Valence + Speechiness
+                   + PopularitySq, data = training_set)
 
-duartion_model = lm(Duration ~ BPM + dB + Danceability +  Liveness + Valence + Speechiness
-                   + Popularity,   data=training_set)
-
-predicted_y = predict(duration_model, validation_set)
-mean((validation_set$Duration - predicted_y)^2)  #1654.036
-
-durationtst = lm(Duration ~ BPM + Danceability +  Liveness + Valence + Speechiness
-                 + Popularity,  data=training_set)
-
-predicted_y2 = predict(durationtst, validation_set)
-mean((validation_set$Duration - predicted_y2)^2)  #1576.374
+predicted_y = predict(durationmodel, validation_set)
+mean((validation_set$Duration - predicted_y)^2) #939.772
 
 
 # Popularity model
