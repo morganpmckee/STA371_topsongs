@@ -214,10 +214,10 @@ training_cases = setdiff(1:301, validation_cases)
 training_set = top10[training_cases,]
 validation_set = top10[validation_cases,]
 
-pop_model = lm(Pop~BPMlog+Energylog+Danceabilitylog+Liveness+dB+Duration+Acousticness, data=music)
+pop_model = lm(Popularity~BPMlog+Energylog+Danceabilitylog+Liveness+dB+Duration+Acousticness, data=music)
 
 predicted_y = predict(pop_model, validation_set) 
-mean((validation_set$pop - predicted_y)^2)
+mean((validation_set$Popularity - predicted_y)^2)
 
 
 # live model
