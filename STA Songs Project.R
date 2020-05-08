@@ -202,12 +202,11 @@ predicted_y2 = predict(durationtst, validation_set)
 mean((validation_set$Duration - predicted_y2)^2)  #1576.374
 
 
-# pop model
-selected_reg = regsubsets(pop~bpm+nrgy+dnce+live,data=top10,method="backward")
+# Popularity model
+selected_reg = regsubsets(Pop~BPM+Energy+Danceability+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music,method="backward")
 plot(selected_reg, scale="r2")
 
-summary(lm(pop~year+bpm+nrgy+dnce+live+val,data=top10))
-summary(lm(pop~year+dnce+live,data=top10))
+summary(lm(Pop~BPM+Energy+Danceability+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music))
 
 set.seed(104)
 validation_cases = sample(1:301, 50, replace = FALSE)
@@ -215,15 +214,17 @@ training_cases = setdiff(1:301, validation_cases)
 training_set = top10[training_cases,]
 validation_set = top10[validation_cases,]
 
-pop_model = lm(pop~year+dnce+live, data=training_set)
+pop_model = lm(Pop~BPM+Energy+Danceability+Liveness+dB+Duration+Acousticness, data=music)
 
 predicted_y = predict(pop_model, validation_set) 
-mean((validation_set$pop - predicted_y)^2) # 156.3503
+mean((validation_set$pop - predicted_y)^2)
 
 
 # live model
-summary(lm(live~year+bpm+nrgy+dnce+val+pop,data=top10))
-summary(lm(live~year+bpm+nrgy+val+pop,data=top10))
+selected_reg = regsubsets(Liveness~BPM+Energy+Danceability+Popularity+Valence+dB+Duration+Acousticness+Speechiness,data=music,method="backward")
+plot(selected_reg, scale="r2")
+
+summary(lm(Liveness~BPM+Energy+Danceability+Popularity+Valence+Duration+Speechiness,data=music))
 
 set.seed(104)
 validation_cases = sample(1:301, 50, replace = FALSE)
@@ -231,15 +232,17 @@ training_cases = setdiff(1:301, validation_cases)
 training_set = top10[training_cases,]
 validation_set = top10[validation_cases,]
 
-live_model = lm(live~year+bpm+nrgy+val+pop, data=training_set)
+live_model = lm(Liveness~BPM+Energy+Danceability+Popularity+Valence+Duration+Speechiness, data=music)
 
 predicted_y = predict(live_model, validation_set) 
-mean((validation_set$live - predicted_y)^2) # 184.6233
+mean((validation_set$live - predicted_y)^2) 
 
 
 # bpm model
-summary(lm(bpm~live+year+nrgy+dnce+val+pop,data=top10))
-summary(lm(bpm~year+nrgy+dnce+pop,data=top10))
+selected_reg = regsubsets(BPM~Popularity+Energy+Danceability+Liveness+Valence+dB+Duration+Acousticness+Speechiness,data=music,method="backward")
+plot(selected_reg, scale="r2")
+
+summary(lm(BPM~Energy+Danceability+Liveness+dB+Duration+Acousticness+Speechiness,data=music))
 
 set.seed(104)
 validation_cases = sample(1:301, 50, replace = FALSE)
@@ -247,10 +250,10 @@ training_cases = setdiff(1:301, validation_cases)
 training_set = top10[training_cases,]
 validation_set = top10[validation_cases,]
 
-bpm_model = lm(bpm~year+nrgy+dnce+pop, data=training_set)
+bpm_model = lm(BPM~Energy+Danceability+Liveness+dB+Duration+Acousticness+Speechiness, data=music)
 
 predicted_y = predict(bpm_model, validation_set) 
-mean((validation_set$live - predicted_y)^2) # 10566.84 ?
+mean((validation_set$live - predicted_y)^2) 
 
 # Extra Portion
 
